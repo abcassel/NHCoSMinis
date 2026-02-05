@@ -1,4 +1,4 @@
-xsistsimport streamlit as st
+import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 import pandas as pd
 
@@ -24,11 +24,11 @@ st.divider()
 
 # --- THE LIST VIEW ---
 for index, row in display_df.iterrows():
-    status_emoji = "🟢" if row['owned'] else "⌧"
+    status_emoji = "🟢" if row['owned'] else "🔴"
     
     with st.container(border=True):
-        # We'll tighten the columns to give the name more space
-        col1, col2, col3, col4 = st.columns([4, 1, 1, 1])
+        # Using a very compact column ratio
+        col1, col2, col3, col4 = st.columns([5, 1, 1, 1])
         
         with col1:
             st.markdown(f"**{status_emoji} {row['name']}**")
@@ -39,15 +39,20 @@ for index, row in display_df.iterrows():
             st.write(f"Qty: {row['qty_target']}")
             
         with col3:
-            # THE JUMP TO STATS BUTTON (Emoji Only)
+            # STATS BUTTON
             formatted_name = row['name'].lower().replace(" ", "-")
             stats_url = f"https://open5e.com/monsters/{formatted_name}"
             st.link_button("📊", stats_url, use_container_width=True, help="View Stats")
             
         with col4:
-            # THE TOGGLE BUTTON
-            button_label = "Found" if not row['owned'] else "Undo"
-            if st.button(button_label, key=f"btn_{row['id']}", use_container_width=True):
-                df.at[index, 'owned'] = not row['owned']
-                conn.update(data=df)
-                st.rerun()
+            # THE TOGGLE BUTTON (Green Check vs Undo)
+            if not row['owned']:
+                if st.button("✅", key=f"btn_{row['id']}", use_container_width=True, help="Mark as Owned"):
+                    df.at[index, 'owned'] = True
+                    conn.update(data=df)
+                    st.rerun()
+            else:
+                if st.button("🔄", key=f"btn_{row['id']}", use_container_width=True, help="Mark as Missing"):
+                    df.at[index, 'owned'] = False
+                    conn.update(data=df)
+                    st.rerun()
