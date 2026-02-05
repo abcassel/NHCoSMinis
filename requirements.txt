@@ -1,1 +1,2 @@
-﻿pandas
+pandas
+st-gsheets-connection
