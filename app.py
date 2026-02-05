@@ -1,72 +1,63 @@
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
-import random
+import pandas as pd
 
-st.set_page_config(page_title="D&D Mini Tracker", layout="centered")
+# --- APP CONFIG ---
+st.set_page_config(page_title="D&D Mini & Stat Tracker", layout="wide")
 
 # --- CONNECT TO GOOGLE SHEETS ---
 conn = st.connection("gsheets", type=GSheetsConnection)
 df = conn.read(ttl=0)
 
-# Initialize session state for navigation
-if 'nav_mode' not in st.session_state:
-    st.session_state.nav_mode = "ABC"
+# Ensure 'owned' is boolean for the toggle logic
+df['owned'] = df['owned'].astype(bool)
 
-st.title("⚔️ Creature Verification")
+st.title("⚔️ Barovia Inventory & Bestiary")
 
 # --- SEARCH BAR ---
-# Creates a searchable list of all creature names
-search_query = st.selectbox("🔍 Quick Search for a Creature:", 
-                            options=[""] + list(df['name'].sort_values().unique()),
-                            help="Start typing a name to jump directly to that creature")
+search_query = st.text_input("🔍 Search creatures...", placeholder="Type name here (e.g. Bat, Strahd, Knight)")
+
+# --- FILTERING ---
+display_df = df.sort_values(by='name')
+if search_query:
+    display_df = display_df[display_df['name'].str.contains(search_query, case=False)]
 
 st.divider()
 
-# --- NAVIGATION MODES ---
-st.write("### Queue Order:")
-c1, c2, c3 = st.columns(3)
-if c1.button("🔤 ABC (Needed)"): st.session_state.nav_mode = "ABC"
-if c2.button("🐾 TYPE (Needed)"): st.session_state.nav_mode = "TYPE"
-if c3.button("🎲 RANDOM (All)"): st.session_state.nav_mode = "RANDOM"
-
-# --- FILTERING LOGIC ---
-if search_query != "":
-    # If user searched for something, prioritize that specific row
-    display_queue = df[df['name'] == search_query]
-    st.caption(f"Viewing search result for: {search_query}")
-else:
-    # Otherwise, use the standard queue logic
-    needed_df = df[df['owned'] == False].copy()
+# --- THE LIST VIEW ---
+for index, row in display_df.iterrows():
+    # Define status visual
+    status_emoji = "🟢" if row['owned'] else "🔴"
     
-    if st.session_state.nav_mode == "ABC":
-        display_queue = needed_df.sort_values(by='name')
-    elif st.session_state.nav_mode == "TYPE":
-        display_queue = needed_df.sort_values(by=['category', 'name'])
-    elif st.session_state.nav_mode == "RANDOM":
-        display_queue = df.sample(frac=1)
-
-# --- DISPLAY CARD ---
-if not display_queue.empty:
-    item = display_queue.iloc[0]
-    item_index = df[df['id'] == item['id']].index[0]
-
     with st.container(border=True):
-        st.header(f"{item['name']}")
-        st.write(f"**ID:** {item['id']} | **Type:** {item['category']}")
-        st.write(f"**Target:** {item['qty_target']} | **Priority:** {item['priority']}")
+        col1, col2, col3 = st.columns([3, 2, 1])
         
-        if item['owned']:
-            st.success("✅ ALREADY IN INVENTORY")
+        with col1:
+            st.markdown(f"### {status_emoji} {row['name']}")
+            st.caption(f"**Category:** {row['category']} | **ID:** {row['id']}")
+            if pd.notna(row['notes']) and row['notes'] != "":
+                st.info(f"📍 {row['notes']}")
         
-        col_a, col_b = st.columns(2)
-        
-        if col_a.button("✅ Mark as Exists", use_container_width=True):
-            df.at[item_index, 'owned'] = True
-            conn.update(data=df)
-            st.balloons()
-            st.rerun()
+        with col2:
+            # DYNAMIC STAT BUTTON
+            # Formats name for URL: "Dire Wolf" -> "dire-wolf"
+            formatted_name = row['name'].lower().replace(" ", "-")
             
-        if col_b.button("⏭️ Next Creature", use_container_width=True):
-            st.rerun()
-else:
-    st.success("All caught up! No more items match your current filter.")
+            # We'll use Open5e as the primary source as it's very reliable for SRD monsters
+            stats_url = f"https://open5e.com/monsters/{formatted_name}"
+            
+            st.write(f"**Target Qty:** {row['qty_target']}")
+            st.link_button("📜 View Stat Block", stats_url, use_container_width=True)
+            
+        with col3:
+            # THE TOGGLE BUTTON
+            button_label = "Got it!" if not row['owned'] else "Mark Missing"
+            if st.button(button_label, key=f"btn_{row['id']}", use_container_width=True):
+                df.at[index, 'owned'] = not row['owned']
+                conn.update(data=df)
+                st.rerun()
+
+# --- FOOTER ---
+st.divider()
+needed_count = len(df[df['owned'] == False])
+st.write(f"💡 **Quick Tip:** You still need to find **{needed_count}** more miniatures to complete the set.")
