@@ -1,4 +1,4 @@
-import streamlit as st
+xsistsimport streamlit as st
 from streamlit_gsheets import GSheetsConnection
 import pandas as pd
 
@@ -24,7 +24,7 @@ st.divider()
 
 # --- THE LIST VIEW ---
 for index, row in display_df.iterrows():
-    status_emoji = "🟢" if row['owned'] else "🔴"
+    status_emoji = "🟢" if row['owned'] else "⌧"
     
     with st.container(border=True):
         # We'll tighten the columns to give the name more space
