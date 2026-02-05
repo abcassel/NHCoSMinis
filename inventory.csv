@@ -1,0 +1,85 @@
+﻿id,category,name,notes,owned,qty_owned,qty_target,priority
+H01,Human,Acolyte,,FALSE,0,2,Medium
+H02,Human,Archmage,,FALSE,0,1,Low
+H03,Human,Assassin,,FALSE,0,1,Medium
+H04,Human,Bandit,Generic reuse,FALSE,0,6,High
+H05,Human,Berserker,,FALSE,0,2,Medium
+H06,Human,Commoner,Villagers,FALSE,0,8,High
+H07,Human,Cult Fanatic,,FALSE,0,3,Medium
+H08,Human,Druid,Yester Hill,FALSE,0,4,High
+H09,Human,Gladiator,,FALSE,0,1,Low
+H10,Human,Guard,,FALSE,0,4,Medium
+H11,Human,Knight,,FALSE,0,1,Medium
+H12,Human,Mage,,FALSE,0,1,Medium
+H13,Human,Noble,Vallaki,FALSE,0,2,Medium
+H14,Human,Priest,,FALSE,0,2,High
+H15,Human,Scout,,FALSE,0,2,Medium
+H16,Human,Spy,,FALSE,0,1,Low
+H17,Human,Thug,,FALSE,0,4,High
+H18,Human,Veteran,,FALSE,0,2,Medium
+O01,Object,Animated Armor,,FALSE,0,2,Medium
+O02,Object,Animated Halberd,,FALSE,0,2,Low
+O03,Object,Flying Sword,,FALSE,0,2,Medium
+O04,Object,Rug of Smothering,,FALSE,0,1,Medium
+A01,Animal,Bat,,FALSE,0,6,High
+A02,Animal,Cat,,FALSE,0,1,Low
+A03,Animal,Baboon,,FALSE,0,1,Low
+A04,Animal,Dire Wolf,,FALSE,0,4,High
+A05,Animal,Draft Horse,,FALSE,0,1,Medium
+A06,Animal,Giant Goat,,FALSE,0,1,Low
+A07,Animal,Giant Poisonous Snake,,FALSE,0,2,Medium
+A08,Animal,Giant Spider,,FALSE,0,2,Medium
+A09,Animal,Giant Wolf Spider,,FALSE,0,2,Medium
+A10,Animal,Goat,,FALSE,0,2,Low
+A11,Animal,Mastiff,,FALSE,0,2,Medium
+A12,Animal,Mule,,FALSE,0,1,Low
+A13,Animal,Raven,Keepers of the Feather,FALSE,0,6,High
+A14,Animal,Riding Horse,,FALSE,0,2,Medium
+A15,Animal,Saber Toothed Tiger,,FALSE,0,1,Medium
+A16,Animal,Wolf,,FALSE,0,6,High
+S01,Swarm,Swarm of Bats,,FALSE,0,2,High
+S02,Swarm,Swarm of Centipedes,,FALSE,0,1,Low
+S03,Swarm,Swarm of Insects,,FALSE,0,1,Low
+S04,Swarm,Swarm of Poisonous Snakes,,FALSE,0,1,Medium
+S05,Swarm,Swarm of Rats,,FALSE,0,2,High
+S06,Swarm,Swarm of Ravens,,FALSE,0,1,Medium
+S07,Swarm,Swarm of Spiders,,FALSE,0,1,Medium
+S08,Swarm,Swarm of Wasps,,FALSE,0,1,Low
+U01,Undead,Zombie,Core enemy,FALSE,0,8,High
+U02,Undead,Skeleton,Core enemy,FALSE,0,8,High
+U03,Undead,Vampire,,FALSE,0,1,High
+U04,Undead,Vampire Spawn,,FALSE,0,4,High
+U05,Undead,Ghoul,,FALSE,0,4,High
+U06,Undead,Ghast,,FALSE,0,1,Medium
+U07,Undead,Ghost,,FALSE,0,1,Medium
+U08,Undead,Poltergeist,,FALSE,0,1,Medium
+U09,Undead,Specter,,FALSE,0,2,Medium
+U10,Undead,Shadow,,FALSE,0,4,Medium
+U11,Undead,Wight,,FALSE,0,2,Medium
+U12,Undead,Wraith,,FALSE,0,1,Medium
+U13,Undead,Will o Wisp,,FALSE,0,1,Medium
+U14,Undead,Revenant,,FALSE,0,1,Medium
+U15,Undead,Warhorse Skeleton,,FALSE,0,1,Low
+B01,Blight,Twig Blight,,FALSE,0,6,High
+B02,Blight,Needle Blight,,FALSE,0,4,High
+B03,Blight,Vine Blight,,FALSE,0,4,High
+C01,Construct,Flesh Golem,,FALSE,0,1,Medium
+C02,Construct,Clay Golem,,FALSE,0,1,Low
+C03,Construct,Stone Golem,,FALSE,0,1,Low
+C04,Construct,Iron Golem,,FALSE,0,1,Low
+C05,Construct,Shield Guardian,,FALSE,0,1,Low
+F01,Fiend,Night Hag,,FALSE,0,1,Medium
+F02,Fiend,Nightmare,,FALSE,0,1,Medium
+F03,Fiend,Imp,,FALSE,0,1,Low
+F04,Fiend,Quasit,,FALSE,0,1,Low
+F05,Fiend,Vrock,,FALSE,0,1,Low
+X01,Other,Scarecrow,Iconic Barovia,FALSE,0,3,High
+X02,Other,Werewolf,,FALSE,0,4,High
+X03,Other,Hell Hound,,FALSE,0,2,Medium
+X04,Other,Nothic,,FALSE,0,1,Medium
+X05,Other,Invisible Stalker,,FALSE,0,1,Low
+X06,Other,Black Pudding,,FALSE,0,1,Low
+X07,Other,Gray Ooze,,FALSE,0,1,Low
+X08,Other,Crawling Claw,,FALSE,0,2,Medium
+X09,Other,Banshee,,FALSE,0,1,Medium
+X10,Other,Deva,,FALSE,0,1,Low
