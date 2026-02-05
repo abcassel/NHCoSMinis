@@ -12,47 +12,58 @@ df['owned'] = df['owned'].astype(bool)
 
 st.title("⚔️ Miniatures Catalog")
 
-# --- SEARCH ---
-search_query = st.text_input("🔍 Search creatures...", placeholder="Search...")
-
-# --- FILTERING ---
-display_df = df.sort_values(by='name')
-if search_query:
-    display_df = display_df[display_df['name'].str.contains(search_query, case=False)]
+# --- ALPHABETICAL DROPDOWN SEARCH ---
+# Creates an alphabetical list for the dropdown
+inventory_list = sorted(df['name'].tolist())
+selected_creature = st.selectbox(
+    "🔍 Search or Select from Inventory:", 
+    options=[""] + inventory_list, 
+    placeholder="Choose a creature..."
+)
 
 st.divider()
 
+# --- FILTERING LOGIC ---
+display_df = df.sort_values(by='name')
+
+# If a user selects from the dropdown, show ONLY that creature
+if selected_creature:
+    display_df = display_df[display_df['name'] == selected_creature]
+
 # --- THE LIST VIEW ---
 for index, row in display_df.iterrows():
-    status_emoji = "🟢" if row['owned'] else "🔴"
-    
     with st.container(border=True):
-        # Using a very compact column ratio
-        col1, col2, col3, col4 = st.columns([5, 1, 1, 1])
+        # Layout: Checkbox | Name | Qty | Stats
+        col_check, col_name, col_qty, col_stats = st.columns([1, 5, 1, 1])
         
-        with col1:
-            st.markdown(f"**{status_emoji} {row['name']}**")
-            if pd.notna(row['notes']) and row['notes'] != "":
-                st.caption(f"*{row['notes']}*")
-        
-        with col2:
-            st.write(f"Qty: {row['qty_target']}")
-            
-        with col3:
-            # STATS BUTTON
-            formatted_name = row['name'].lower().replace(" ", "-")
-            stats_url = f"https://open5e.com/monsters/{formatted_name}"
-            st.link_button("📊", stats_url, use_container_width=True, help="View Stats")
-            
-        with col4:
-            # THE TOGGLE BUTTON (Green Check vs Undo)
+        with col_check:
+            # The Toggle Button
             if not row['owned']:
-                if st.button("✅", key=f"btn_{row['id']}", use_container_width=True, help="Mark as Owned"):
+                if st.button("✅", key=f"check_{row['id']}", use_container_width=True, help="Mark Owned"):
                     df.at[index, 'owned'] = True
                     conn.update(data=df)
                     st.rerun()
             else:
-                if st.button("🔄", key=f"btn_{row['id']}", use_container_width=True, help="Mark as Missing"):
+                if st.button("🔄", key=f"undo_{row['id']}", use_container_width=True, help="Unmark"):
                     df.at[index, 'owned'] = False
                     conn.update(data=df)
                     st.rerun()
+        
+        with col_name:
+            # Highlight name if owned
+            if row['owned']:
+                st.markdown(f"**{row['name']}** (Inventory)")
+            else:
+                st.markdown(f"**{row['name']}**")
+                
+            if pd.notna(row['notes']) and row['notes'] != "":
+                st.caption(f"*{row['notes']}*")
+        
+        with col_qty:
+            st.write(f"Qty: {row['qty_target']}")
+            
+        with col_stats:
+            # STATS BUTTON
+            formatted_name = row['name'].lower().replace(" ", "-")
+            stats_url = f"https://open5e.com/monsters/{formatted_name}"
+            st.link_button("📊", stats_url, use_container_width=True)
