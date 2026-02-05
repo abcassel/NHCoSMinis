@@ -1,53 +1,72 @@
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
+import random
 
-# --- APP CONFIG ---
-st.set_page_config(page_title="D&D Permanent Tracker", layout="centered")
-
-st.title("⚔️ Permanent Inventory Tracker")
+st.set_page_config(page_title="D&D Mini Tracker", layout="centered")
 
 # --- CONNECT TO GOOGLE SHEETS ---
-# This creates a connection object
 conn = st.connection("gsheets", type=GSheetsConnection)
+df = conn.read(ttl=0)
 
-# Read the existing data
-# Replace 'YOUR_SHEET_URL_HERE' with your actual sheet link in the next step
-df = conn.read(ttl=0) # ttl=0 ensures we always get fresh data
+# Initialize session state for navigation
+if 'nav_mode' not in st.session_state:
+    st.session_state.nav_mode = "ABC"
 
-# --- LOGIC ---
-tabs = st.tabs(["Verification Feed", "Inventory So Far", "Still Needed"])
+st.title("⚔️ Creature Verification")
 
-with tabs[0]:
-    # Filter for items where owned is False
-    queue = df[df['owned'] == False]
+# --- SEARCH BAR ---
+# Creates a searchable list of all creature names
+search_query = st.selectbox("🔍 Quick Search for a Creature:", 
+                            options=[""] + list(df['name'].sort_values().unique()),
+                            help="Start typing a name to jump directly to that creature")
+
+st.divider()
+
+# --- NAVIGATION MODES ---
+st.write("### Queue Order:")
+c1, c2, c3 = st.columns(3)
+if c1.button("🔤 ABC (Needed)"): st.session_state.nav_mode = "ABC"
+if c2.button("🐾 TYPE (Needed)"): st.session_state.nav_mode = "TYPE"
+if c3.button("🎲 RANDOM (All)"): st.session_state.nav_mode = "RANDOM"
+
+# --- FILTERING LOGIC ---
+if search_query != "":
+    # If user searched for something, prioritize that specific row
+    display_queue = df[df['name'] == search_query]
+    st.caption(f"Viewing search result for: {search_query}")
+else:
+    # Otherwise, use the standard queue logic
+    needed_df = df[df['owned'] == False].copy()
     
-    if len(queue) > 0:
-        item = queue.iloc[0]
-        # Find the exact row index in the original dataframe
-        item_index = queue.index[0]
+    if st.session_state.nav_mode == "ABC":
+        display_queue = needed_df.sort_values(by='name')
+    elif st.session_state.nav_mode == "TYPE":
+        display_queue = needed_df.sort_values(by=['category', 'name'])
+    elif st.session_state.nav_mode == "RANDOM":
+        display_queue = df.sample(frac=1)
 
-        with st.container(border=True):
-            st.subheader(f"{item['name']} ({item['id']})")
-            st.write(f"**Target Qty:** {item['qty_target']} | **Priority:** {item['priority']}")
+# --- DISPLAY CARD ---
+if not display_queue.empty:
+    item = display_queue.iloc[0]
+    item_index = df[df['id'] == item['id']].index[0]
+
+    with st.container(border=True):
+        st.header(f"{item['name']}")
+        st.write(f"**ID:** {item['id']} | **Type:** {item['category']}")
+        st.write(f"**Target:** {item['qty_target']} | **Priority:** {item['priority']}")
+        
+        if item['owned']:
+            st.success("✅ ALREADY IN INVENTORY")
+        
+        col_a, col_b = st.columns(2)
+        
+        if col_a.button("✅ Mark as Exists", use_container_width=True):
+            df.at[item_index, 'owned'] = True
+            conn.update(data=df)
+            st.balloons()
+            st.rerun()
             
-            col1, col2 = st.columns(2)
-            
-            if col1.button("✅ Exists", use_container_width=True):
-                # Update the value in the dataframe
-                df.at[item_index, 'owned'] = True
-                # Write the whole dataframe back to the Google Sheet
-                conn.update(data=df)
-                st.success(f"Updated {item['name']}!")
-                st.rerun()
-                
-            if col2.button("📁 File Needed", use_container_width=True):
-                st.info("Item remains in 'Still Needed' list.")
-                # You could add logic here to flag 'needs_filing' if you add a column for it
-    else:
-        st.success("🎉 All items verified!")
-
-with tabs[1]:
-    st.dataframe(df[df['owned'] == True][['id', 'name', 'category']])
-
-with tabs[2]:
-    st.dataframe(df[df['owned'] == False][['id', 'name', 'priority']])
+        if col_b.button("⏭️ Next Creature", use_container_width=True):
+            st.rerun()
+else:
+    st.success("All caught up! No more items match your current filter.")
