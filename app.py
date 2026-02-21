@@ -53,13 +53,13 @@ for index, row in display_df.iterrows():
             if not is_complete:
                 if st.button("✅", key=f"add_{row['id']}", use_container_width=True):
                     df.at[index, 'qty_owned'] += 1
-                    conn.update(data=df)
+                    conn.update(worksheet="Sheet1", data=df))
                     st.rerun()
             else:
                 # 🔄 Button: Resets to 0
                 if st.button("🔄", key=f"reset_{row['id']}", use_container_width=True):
                     df.at[index, 'qty_owned'] = 0
-                    conn.update(data=df)
+                    conn.update(worksheet="Sheet1", data=df)
                     st.rerun()
         
         with col_name:
